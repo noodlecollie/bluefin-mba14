@@ -14,6 +14,16 @@ FROM ghcr.io/ublue-os/bluefin:stable
 # Fedora base image: quay.io/fedora/fedora-bootc:41
 # CentOS base images: quay.io/centos-bootc/centos-bootc:stream10
 
+# akmods, as per the example in http://github.com/ublue-os/akmods readme
+COPY --from=ghcr.io/ublue-os/akmods:coreos-stable-43-x86_64 / /tmp/akmods-common
+RUN find /tmp/akmods-common
+RUN dnf install -y /tmp/akmods-common/rpms/ublue-os/ublue-os-akmods*.rpm
+
+# This is the wl driver that supports the Broadcom BCM4360 chip
+RUN dnf install -y \
+  /tmp/akmods-common/rpms/common/broadcom-wl*.rpm \
+  /tmp/akmods-common/rpms/kmods/kmod-wl*.rpm
+
 ### [IM]MUTABLE /opt
 ## Some bootable images, like Fedora, have /opt symlinked to /var/opt, in order to
 ## make it mutable/writable for users. However, some packages write files to this directory,
