@@ -15,7 +15,15 @@ FROM ghcr.io/ublue-os/bluefin:stable
 # CentOS base images: quay.io/centos-bootc/centos-bootc:stream10
 
 # akmods, as per the example in http://github.com/ublue-os/akmods readme
-COPY --from=ghcr.io/ublue-os/akmods:coreos-stable-43-x86_64 / /tmp/akmods-common
+# In case of incompatibilities, where builds fail with a message like
+#   nothing provides kernel-uname-r = 7.0.8-100.fc43.x86_64 needed by kmod-wl-6.30.223.271-62.fc43.x86_64"
+# do the following:
+# 1. Check https://github.com/ublue-os/bluefin/pkgs/container/bluefin/versions?filters%5Bversion_type%5D=tagged
+#    for which version is tagged as "stable", and check what the other tags are.
+# 2. Check the akmods tag below to see what it targets, and update it if required.
+#    For example, a Bluefin image "stable-44.something" should match an akmods
+#    image "coreos-stable-44-x86_64"
+COPY --from=ghcr.io/ublue-os/akmods:coreos-stable-44-x86_64 / /tmp/akmods-common
 RUN find /tmp/akmods-common
 RUN dnf install -y /tmp/akmods-common/rpms/ublue-os/ublue-os-akmods*.rpm
 
